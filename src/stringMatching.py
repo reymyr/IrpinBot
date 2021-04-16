@@ -1,3 +1,9 @@
+import re
+
+# Mengembalikan tanggal dalam text dengan format dd/mm/yyyy
+def getDates(text):
+    return re.findall(r"((?:0?[1-9]|[12][\d]|3[01])\/(?:0?[1-9]|1[12])\/(?:\d{4}))", text)
+
 # Mengembalikan index awal kemunculan pattern atau -1 jika tidak ditemukan
 def boyerMoore(text, pattern):
     # Ubah ke lowercase agar tidak case sensitive
