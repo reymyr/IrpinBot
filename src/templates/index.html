@@ -38,32 +38,29 @@
 
     <div class="chat">        
         <div class="chat-box" id="chat-box" onload="scrollToBottom()">
-            <ul class="message-list">
-                
-                <li class="sent">
-                    <p>
-                        <span>Astaghfirullah</span>
-                    </p>
-
-                </li>
-                <li class="received">
-                    <p>
-                        <img class="avatar" src="{{url_for('static', filename='spider.jpg')}}"></img>
-                        <span>Assalamualaikum</span>
-                    </p>
-                </li>
+            <div class="message-list">
+                <div class="message sent">
+                    <div class="message-inner">
+                        <div class="content">Astaghfirullah</div>
+                    </div>
+                </div>
+                <div class="message received">
+                    <img class="avatar" src="{{url_for('static', filename='spider.jpg')}}"></img>
+                    <div class="message-inner">
+                        <div class="content">Assalamualaikum</div>
+                    </div>
+                </div>
                 {% for msg in messages %}
-                <li class="{{msg[0]}}">
-                    <p>
-                        {% if msg[0] == 'received' %}
-                        <img class="avatar" src="{{url_for('static', filename='spider.jpg')}}"></img>
-                        {% endif %}
-                        <span>{{ msg[1] }}</span>
-                    </p>
-
-                </li>
+                <div class="message {{msg[0]}}">
+                    {% if msg[0] == 'received' %}
+                    <img class="avatar" src="{{url_for('static', filename='spider.jpg')}}"></img>
+                    {% endif %}
+                    <div class="message-inner">
+                        <div class="content">{{ msg[1] }}</div>
+                    </div>
+                </div>
                 {% endfor %}
-            </ul>
+            </div>
         </div>
     
         <form action="/send" class="input-text" method="POST">

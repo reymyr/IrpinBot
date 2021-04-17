@@ -112,9 +112,9 @@ body {
 }
 
 .chat-box {
-    overflow: auto;
+    overflow-Y: auto;
     margin-bottom: 1px;
-  }
+}
 
 .message-list {
     padding-top: 10px;
@@ -122,56 +122,32 @@ body {
     padding-right: 10px;
 }
 
-.message-list span {
-    padding: 8px;
-    border-radius: 4px;
+.message {
+    display: flex;
+    margin-bottom: 15px;
 }
 
-.message-list .sent span{
-    background: #99cc00;
-    border-radius: 999px 999px 0px 999px;
+.message .message-inner {
+    max-width: 75%;
 }
 
-.message-list .sent p{
-    float: right;
+.message .message-inner .content {
+    display: inline-block;
+    padding: 8px 16px;
+    background-color: #F3F3F3;
+    border-radius: 25px;
+    text-align: left;
+    width: 100%;
+    word-wrap: break-word;
 }
 
-.message-list .received span{
-    background: #F3F3F3;
-    border-radius: 999px 999px 999px 0px;
+.message.sent { 
+    justify-content: flex-end;
+    text-align: right;
 }
 
-.message-list .received p{
-    float: left;
-}
-
-.view.chat .chat-box .message .message-inner .content {
-  display: inline-block;
-  padding: 10px 20px;
-  background-color: #F3F3F3;
-  border-radius: 999px;
-  color: #333;
-  font-size: 18px;
-  line-height: 1.2em;
-  text-align: left;
-}
-
-.view.chat .chat-box .message.current-user {
-  margin-top: 30px;
-  -webkit-box-pack: end;
-      -ms-flex-pack: end;
-          justify-content: flex-end;
-  text-align: right;
-}
-
-.view.chat .chat-box .message.current-user .message-inner {
-  max-width: 75%;
-}
-
-.view.chat .chat-box .message.current-user .message-inner .content {
-  color: #FFF;
-  font-weight: 600;
-  background-color: #ea526f;
+.message.sent .message-inner .content {
+    background-color: #99cc00;
 }
 
 .input-text {
@@ -199,8 +175,9 @@ body {
 }
 
 .avatar {
+    margin-top: 0;
     width: 50px;
     height: 50px;
     border-radius: 50%;
     margin: 2px 5px;
-  }
+}
