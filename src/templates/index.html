@@ -56,7 +56,7 @@
                     <img class="avatar" src="{{url_for('static', filename='spider.jpg')}}"></img>
                     {% endif %}
                     <div class="message-inner">
-                        <div class="content">{{ msg[1] }}</div>
+                        <div class="content">{{ msg[1] | safe }}</div>
                     </div>
                 </div>
                 {% endfor %}

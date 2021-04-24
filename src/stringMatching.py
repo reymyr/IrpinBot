@@ -4,6 +4,25 @@ import re
 def getDates(text):
     return re.findall(r"((?:0?[1-9]|[12][\d]|3[01])\/(?:0?[1-9]|1[12])\/(?:\d{4}))", text)
 
+# Mengembalikan kode matkul dalam text dengan format AAYYYY, A adalah huruf kapital dan Y adalah angka
+def getKodeMatkul(text):
+    return re.findall(r"\b[A-Z]{2}\d{4}\b", text)
+
+# Memeriksa apakah kata dalam keywords ada dalam text
+# all = True -> semua kata dalam keywords
+# all = False -> salah satu kata dalam keywords
+def textContains(text, keywords, all=False):
+    if all:
+        for key in keywords:
+            if boyerMoore(text, key) == -1:
+                return False
+        return True
+    else:
+        for key in keywords:
+            if boyerMoore(text, key) != -1:
+                return True
+        return False
+
 # Mengembalikan index awal kemunculan pattern atau -1 jika tidak ditemukan
 def boyerMoore(text, pattern):
     # Ubah ke lowercase agar tidak case sensitive
