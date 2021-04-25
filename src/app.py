@@ -45,7 +45,8 @@ def processMessage(text):
 
     if len(getKodeMatkul(text)) == 0:
         return getTasks(text)
-
+    elif len(getKodeMatkul(text)[0]) == 6:
+        return getTasksDeadline(text)
 
 def getTasks(text):
     seluruh = ["sejauh ini", "sampai sekarang", "semuanya", "sampe sekarang", "semua"]
@@ -122,7 +123,35 @@ def getTasks(text):
         return reply
     else:
         return "ga valid bro"
+
+def getTasksDeadline(text):
+    kodeMatkul = getKodeMatkul(text)
+    today = datetime.date.today()
+    jenis = None
+    keyValid = False
+
+    for key in keywords:
+        if((key == "Tubes") or (key == "Tucil")):
+            jenis = key
+            if textContains(text, [key]):
+                keyValid = True
+                break
     
+    if (keyValid):
+        tasks = None
+        #print(jenis, today)
+        tasks = Task.query.filter((Task.jenis == jenis) & (Task.tanggal >= today) & (Task.kode == kodeMatkul[0])).all()
+
+        if len(tasks) == 0:
+            reply = "Tidak ada"
+        else:
+            reply = '[Deadline ' + jenis + ' ' + kodeMatkul[0] + ']<br>'
+            for i in range(len(tasks)):
+                task = tasks[i]
+                reply += str(i+1) + ". " + task.tanggal.strftime("%d/%m/%Y") + " - " + task.jenis + " - " + task.topik + '<br>'
+        return reply
+    else:
+        return "ga valid bro"
 
 if __name__ == "__main__":
     app.run(debug=True,threaded=True)
