@@ -10,6 +10,7 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
 db = SQLAlchemy(app)
 
 keywords = ["Kuis", "Ujian", "Tucil", "Tubes", "Praktikum"]
+helpWords = ["bisa", "kemampuan", "fitur", "help", "bantuan", "tolong"]
 
 class Task(db.Model):
     id_task = db.Column(db.Integer, primary_key = True)
@@ -44,8 +45,10 @@ def processMessage(text):
     # If ada 4 komponen, add task
 
     if len(getKodeMatkul(text)) == 0:
+        if (textContains(text,helpWords)):
+            return getHelp(text)
         return getTasks(text)
-    elif len(getKodeMatkul(text)[0]) == 6:
+    elif len(getKodeMatkul(text)[0]) != 0:
         return getTasksDeadline(text)
 
 def getTasks(text):
@@ -149,6 +152,23 @@ def getTasksDeadline(text):
             for i in range(len(tasks)):
                 task = tasks[i]
                 reply += str(i+1) + ". " + task.tanggal.strftime("%d/%m/%Y") + " - " + task.jenis + " - " + task.topik + '<br>'
+        return reply
+    else:
+        return "ga valid bro"
+
+def getHelp(text):
+    fitur = ["Menambahkan task baru", "Melihat daftar task", "Melihat deadline task tertentu", "Memperbaharui task tertentu", "Menandai task yang sudah dikerjakan"]
+
+    reply = None
+    if textContains(text, helpWords):
+        reply = '[Fitur]<br>'
+        for i in range(len(fitur)):
+            reply += str(i+1) + ". " + fitur[i] + '<br>'
+        
+        reply += '<br>'
+        reply += '[Kata Penting]<br>'
+        for i in range(len(keywords)):
+            reply += str(i+1) + ". " + keywords[i] + '<br>'
         return reply
     else:
         return "ga valid bro"
