@@ -11,6 +11,7 @@ db = SQLAlchemy(app)
 
 keywords = ["Kuis", "Ujian", "Tucil", "Tubes", "Praktikum"]
 helpWords = ["bisa", "kemampuan", "fitur", "help", "bantuan", "tolong"]
+updateWords = ["diubah","diundur","dimajukan"]
 
 class Task(db.Model):
     id_task = db.Column(db.Integer, primary_key = True)
@@ -47,6 +48,8 @@ def processMessage(text):
     if len(getKodeMatkul(text)) == 0:
         if (textContains(text,helpWords)):
             return getHelp(text)
+        elif (textContains(text,updateWords)):
+            return updateTasksDeadline(text)
         return getTasks(text)
     elif len(getKodeMatkul(text)[0]) != 0:
         return getTasksDeadline(text)
@@ -152,6 +155,41 @@ def getTasksDeadline(text):
             for i in range(len(tasks)):
                 task = tasks[i]
                 reply += str(i+1) + ". " + task.tanggal.strftime("%d/%m/%Y") + " - " + task.jenis + " - " + task.topik + '<br>'
+        return reply
+    else:
+        return "ga valid bro"
+
+def updateTasksDeadline(text):
+    kataKunci = ["diubah","diundur","dimajukan"]
+    date = None
+    keyValid = False
+    id = None
+
+    for key in kataKunci:
+        if textContains(text,[key]):
+            keyValid = True
+            break
+    
+    if keyValid:
+        tasks = None
+        id = getIdTask(text)
+        date = getDates(text)
+
+        if (len(id) == 0):
+            return "ga valid bro"
+        if (len(date) == 0):
+            return "ga valid bro"
+        # print(date[0])
+
+        tasks = Task.query.filter((Task.id_task == int(id[0]))).all()
+
+        if (len(tasks)) == 0:
+            reply = "Task yang dimaksud tidak dikenali mimin:("
+        else:
+            dateFormat = datetime.datetime.strptime(date[0],"%d/%m/%Y").date()
+            Task.query.filter((Task.id_task == int(id[0]))).update({Task.tanggal: dateFormat})
+            db.session.commit()
+            reply = "Deadline task " + id[0] + " " + key + " menjadi " + date[0]
         return reply
     else:
         return "ga valid bro"

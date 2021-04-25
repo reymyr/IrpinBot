@@ -8,6 +8,10 @@ def getDates(text):
 def getKodeMatkul(text):
     return re.findall(r"\b[A-Z]{2}\d{4}\b", text)
 
+# Mengembalikan no id task dalam text
+def getIdTask(text):
+    return re.findall(r"\b(\d{1}|\d{2}|\d{3})\b", text)
+
 # Memeriksa apakah kata dalam keywords ada dalam text
 # all = True -> semua kata dalam keywords
 # all = False -> salah satu kata dalam keywords
