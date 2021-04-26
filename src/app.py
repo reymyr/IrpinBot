@@ -44,15 +44,61 @@ def send():
 def processMessage(text):
     print(keywords)
     # If ada 4 komponen, add task
+    if (len(getDates(text)) > 0 or len(getDatesAlternate(text)) > 0) and len(getKodeMatkul(text)) > 0 and len(getTopic(text)) > 0:
+        return addTasks(text)
 
     if len(getKodeMatkul(text)) == 0:
-        if (textContains(text,helpWords)):
-            return getHelp(text)
-        elif (textContains(text,updateWords)):
+        if (textContains(text,updateWords)):
             return updateTasksDeadline(text)
+        elif (textContains(text,helpWords)):
+            return getHelp(text)
         return getTasks(text)
     elif len(getKodeMatkul(text)[0]) != 0:
         return getTasksDeadline(text)
+
+def addTasks(text):
+    keyValid = False
+
+    tanggal = None
+    if len(getDates(text)) > 0:
+        tanggal = getDates(text) #masih dalam list inget han
+    else: #pasti dari alternate date
+        tanggal = getDatesAlternate(text)
+        tanggal[0] = convertDateFormat(tanggal[0])
+
+    kode = getKodeMatkul(text)
+
+    key = None
+    for key in keywords:
+        if textContains(text,[key]):
+            keyValid = True
+            break
+
+    topik = getTopic(text)
+
+    #----------UPDATE DATABASE----------#
+    if keyValid:
+        foundEmptyId = False
+        idTask = 0
+        while not foundEmptyId:
+            tasks = Task.query.filter((Task.id_task == idTask)).all()
+            if len(tasks) == 0:
+                newRecord = Task(id_task = idTask, 
+                                tanggal = datetime.datetime.strptime(tanggal[0],"%d/%m/%Y").date(),
+                                kode = kode[0],
+                                jenis = key,
+                                topik = topik)
+                db.session.add(newRecord)
+                db.session.commit()
+                foundEmptyId = True
+            else:
+                idTask+=1
+        reply = '[TASK BERHASIL DICATAT]<br>'
+        reply += "(ID: " + str(idTask) + ") " + tanggal[0] + " - " + kode[0] + " - " + key + " - " + topik
+        return reply
+    else:
+        return "ga valid bro #from addTasks"
+
 
 def getTasks(text):
     seluruh = ["sejauh ini", "sampai sekarang", "semuanya", "sampe sekarang", "semua"]
@@ -173,7 +219,12 @@ def updateTasksDeadline(text):
     if keyValid:
         tasks = None
         id = getIdTask(text)
-        date = getDates(text)
+        # date = getDates(text)
+        if len(getDates(text)) > 0:
+            date = getDates(text) #masih dalam list inget han
+        else: #pasti dari alternate date
+            date = getDatesAlternate(text)
+            date[0] = convertDateFormat(date[0])
 
         if (len(id) == 0):
             return "ga valid bro"

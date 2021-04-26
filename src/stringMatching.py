@@ -1,8 +1,36 @@
 import re
 
+months = {'januari': '1', 'februari':'2', 'maret':'3', 'april':'4','mei':'5','juni':'6','juli':'7','agustus':'8', 'september':'9',
+            'oktober':'10','november':'11','desember':'12'}
+
+# convert bulan format %d %B %y menjadi %d/%m/%y --> masih dalam bentuk string
+def convertDateFormat(text):
+    attr = text.split(' ')
+    return '/'.join((attr[0],months[attr[1].lower()],attr[2]))
+
 # Mengembalikan tanggal dalam text dengan format dd/mm/yyyy
 def getDates(text):
     return re.findall(r"((?:0?[1-9]|[12][\d]|3[01])\/(?:0?[1-9]|1[12])\/(?:\d{4}))", text)
+
+# Mengembalikan tanggal dalam text dengan format dd %B yyyy
+def getDatesAlternate(text):
+    return re.findall(r"((?:0?[1-9]|[12][\d]|3[01])\s(?:[Jj]anuari|[Ff]ebruari|[Mm]aret|[Aa]pril|[Mm]ei|[Jj]u[nl]i|[Aa]gustus|[Ss]eptember|[Oo]ktober|[Nn]ovember|[Dd]esember)\s(?:\d{4}))", text)
+
+# Mengembalikan topik tugas dalam text
+def getTopic(text):
+    temporaryTuple = re.findall(r"(\b[A-Z]{2}\d{4}\b(.|\b)*\bpada\b)", text) #masih mengandung kode matkul dan kata "pada"
+    if (len(temporaryTuple) == 0):
+        return []
+    temporaryText = temporaryTuple[0][0].split()
+    rm = temporaryText[:-1]
+    listToStr = ' '.join([elmt for elmt in rm])
+    checkerTopic = listToStr.split(' ')
+    if len(checkerTopic) <= 1:
+        return []
+    finalSentences = listToStr.split(' ', 1)[1]
+    listToStr = ''.join([elmt for elmt in finalSentences])
+    return listToStr
+
 
 # Mengembalikan kode matkul dalam text dengan format AAYYYY, A adalah huruf kapital dan Y adalah angka
 def getKodeMatkul(text):
