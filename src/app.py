@@ -12,6 +12,7 @@ db = SQLAlchemy(app)
 keywords = ["Kuis", "Ujian", "Tucil", "Tubes", "Praktikum"]
 helpWords = ["bisa", "kemampuan", "fitur", "help", "bantuan", "tolong"]
 updateWords = ["diubah","diundur","dimajukan"]
+doneWords = ["selesai", "beres", "udah"]
 
 class Task(db.Model):
     id_task = db.Column(db.Integer, primary_key = True)
@@ -50,6 +51,8 @@ def processMessage(text):
     if len(getKodeMatkul(text)) == 0:
         if (textContains(text,updateWords)):
             return updateTasksDeadline(text)
+        elif (textContains(text,doneWords)):
+            return removeTask(text)
         elif (textContains(text,helpWords)):
             return getHelp(text)
         return getTasks(text)
@@ -244,6 +247,22 @@ def updateTasksDeadline(text):
         return reply
     else:
         return "ga valid bro"
+
+def removeTask(text):
+    idTask = getIdTask(text)
+    reply = None
+
+    if len(idTask) != 0:
+        tasks = Task.query.filter((Task.id_task == idTask[0])).all()
+        if len(tasks) != 0:
+            task = tasks[0]
+            reply = '[Task dengan ID ' + idTask[0] + ' (' + task.jenis + ' ' + task.kode + ' ' + task.topik + ') ditandai selesai]'
+            Task.query.filter((Task.id_task == idTask[0])).delete()
+            db.session.commit()
+            return reply                
+    return "ga valid bro"
+
+
 
 def getHelp(text):
     fitur = ["Menambahkan task baru", "Melihat daftar task", "Melihat deadline task tertentu", "Memperbaharui task tertentu", "Menandai task yang sudah dikerjakan"]
