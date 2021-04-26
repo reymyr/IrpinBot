@@ -43,7 +43,13 @@ def send():
 
 
 def processMessage(text):
-    print(keywords)
+    #first of all, check apakah ada kekeliruan di text
+    listText = text.split(' ')
+    errorMsg, foundError = recommendWord(listText)
+    if foundError:
+        return errorMsg
+
+
     # If ada 4 komponen, add task
     if (len(getDates(text)) > 0 or len(getDatesAlternate(text)) > 0) and len(getKodeMatkul(text)) > 0 and len(getTopic(text)) > 0:
         return addTasks(text)
@@ -280,6 +286,69 @@ def getHelp(text):
         return reply
     else:
         return "ga valid bro"
+
+# mereturn berapa perubahan yang harus dilakukan untuk dari word1 menjadi word2
+def levenshtein(word1, word2):
+    matrix = [[0 for j in range (len(word2)+1)] for i in range (len(word1)+1)]
+    for i in range (len(word1)+1):
+        matrix[i][0] = i
+    for j in range (len(word2)+1):
+        matrix[0][j] = j
+    
+    for i in range(1, len(word1)+1):
+        for j in range(1, len(word2)+1):
+            if (word1[i-1] == word2[j-1]):
+                matrix[i][j] = min(matrix[i-1][j]+1, matrix[i][j-1]+1, matrix[i-1][j-1])
+            else: #kalo word[i] != word2[j]
+                matrix[i][j] = min(matrix[i-1][j]+1, matrix[i][j-1]+1, matrix[i-1][j-1]+1)
+
+    return matrix[len(word1)][len(word2)]
+# -------------------------------------------------------------------------------- #
+
+# kalo foundError = true, terdapat minimal satu kesalahan pada text
+# foundError = false, text udah bener atau memang ga valid aja
+def recommendWord(listWord):
+    i = 0
+    foundError = False
+    for word in listWord:
+        j = 0
+        for key in keywords:
+            if (len(word)-levenshtein(word,key))/len(word) >= 0.75 and (len(word)-levenshtein(word,key))/len(word) < 1:
+                # word = key
+                listWord[i] = "<b><i>"+keywords[j]+"</i></b>"
+                foundError = True
+                break
+            j+=1
+        j = 0
+        for key in helpWords:
+            if (len(word)-levenshtein(word,key))/len(word) >= 0.75 and (len(word)-levenshtein(word,key))/len(word) < 1:
+                # word = key
+                listWord[i] = "<b><i>"+helpWords[j]+"</i></b>"
+                foundError = True
+                break
+            j+=1
+        j = 0
+        for key in doneWords:
+            if (len(word)-levenshtein(word,key))/len(word) >= 0.75 and (len(word)-levenshtein(word,key))/len(word) < 1:
+                # word = key
+                listWord[i] = "<b><i>"+doneWords[j]+"</i></b>"
+                foundError = True
+                break
+            j+=1
+        j = 0
+        for key in updateWords:
+            if (len(word)-levenshtein(word,key))/len(word) >= 0.75 and (len(word)-levenshtein(word,key))/len(word) < 1:
+                # word = key
+                listWord[i] = "<b><i>"+updateWords[j]+"</i></b>"
+                foundError = True
+                break
+            j+=1
+        i+=1
+
+    reply = "Mungkin maksud kamu:<br>"
+    reply += ' '.join([elmt for elmt in listWord])
+    return reply, foundError
+
 
 if __name__ == "__main__":
     app.run(debug=True,threaded=True)
