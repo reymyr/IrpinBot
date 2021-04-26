@@ -289,6 +289,8 @@ def getHelp(text):
 
 # mereturn berapa perubahan yang harus dilakukan untuk dari word1 menjadi word2
 def levenshtein(word1, word2):
+    word1 = str(word1).lower()
+    word2 = str(word2).lower()
     matrix = [[0 for j in range (len(word2)+1)] for i in range (len(word1)+1)]
     for i in range (len(word1)+1):
         matrix[i][0] = i
