@@ -293,6 +293,21 @@ def getHelp(text):
         reply += '[Kata Penting]<br>'
         for i in range(len(keywords)):
             reply += str(i+1) + ". " + keywords[i] + '<br>'
+
+        reply += '<br>'
+        reply += '[Kata Bantuan]<br>'
+        for i in range(len(helpWords)):
+            reply += str(i+1) + ". " + helpWords[i] + '<br>'
+
+        reply += '<br>'
+        reply += '[Kata Update]<br>'
+        for i in range(len(updateWords)):
+            reply += str(i+1) + ". " + updateWords[i] + '<br>'
+        
+        reply += '<br>'
+        reply += '[Kata Selesai]<br>'
+        for i in range(len(doneWords)):
+            reply += str(i+1) + ". " + doneWords[i] + '<br>'
         return reply
     else:
         return ""
