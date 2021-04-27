@@ -18,6 +18,11 @@ keywords = ["Kuis", "Ujian", "Tucil", "Tubes", "Praktikum"]
 helpWords = ["bisa", "kemampuan", "fitur", "help", "bantuan", "tolong"]
 updateWords = ["diubah","diundur","dimajukan"]
 doneWords = ["selesai", "beres", "udah", "kelar"]
+seluruh = ["sejauh ini", "sampai sekarang", "semuanya", "sampe sekarang", "semua"]
+between = [["antara", "sampai"], ["antara", "dan"], ["dari", "sampai"]]
+nWeek = ["minggu ke depan", "minggu dari sekarang"]
+nDays = ["hari ke depan", "hari dari sekarang"]
+hariIni = ["hari ini"]
 
 class Task(db.Model):
     id_task = db.Column(db.Integer, primary_key = True)
@@ -25,13 +30,6 @@ class Task(db.Model):
     kode = db.Column(db.String(10))
     jenis = db.Column(db.String(10))
     topik = db.Column(db.String(100))
-
-class Keyword(db.Model):
-    id_keyword = db.Column(db.Integer, primary_key = True)
-    jenis = db.Column(db.String(10))
-
-
-messages=[]
 
 @app.route('/')
 def index():
@@ -131,11 +129,6 @@ def addTasks(text):
 
 
 def getTasks(text):
-    seluruh = ["sejauh ini", "sampai sekarang", "semuanya", "sampe sekarang", "semua"]
-    between = [["antara", "sampai"], ["antara", "dan"], ["dari", "sampai"]]
-    nWeek = ["minggu ke depan", "minggu dari sekarang"]
-    nDays = ["hari ke depan", "hari dari sekarang"]
-    hariIni = ["hari ini"]
     today = datetime.date.today()
     start = None
     end = None
