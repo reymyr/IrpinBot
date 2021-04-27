@@ -63,8 +63,7 @@ def processMessage(text):
     # If ada 4 komponen, add task
     if (len(getDates(text)) > 0 or len(getDatesAlternate(text)) > 0) and len(getKodeMatkul(text)) > 0 and len(getTopic(text)) > 0:
         result = addTasks(text)
-
-    if len(getKodeMatkul(text)) == 0:
+    elif len(getKodeMatkul(text)) == 0:
         if (textContains(text,updateWords)):
             result = updateTasksDeadline(text)
         elif (textContains(text,doneWords)):
