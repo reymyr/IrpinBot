@@ -35,7 +35,7 @@ def index():
 @app.route('/send', methods=['POST'])
 def send():
     msg = request.form['message']
-    if msg:
+    if msg and not msg.isspace():
         reply = processMessage(msg)
         messages.append(['sent', request.form['message']])
         messages.append(['received', reply])
@@ -44,7 +44,7 @@ def send():
 
 def processMessage(text):
     #first of all, check apakah ada kekeliruan di text
-    listText = text.split(' ')
+    listText = text.split()
     errorMsg, foundError = recommendWord(listText)
     if foundError:
         return errorMsg
