@@ -42,7 +42,7 @@ def getIdTask(text):
 
 # Memeriksa apakah kata dalam keywords ada dalam text
 # all = True -> semua kata dalam keywords
-# all = False -> salah satu kata dalam keywords
+# all = False -> minimal salah satu kata dalam keywords
 def textContains(text, keywords, all=False):
     if all:
         for key in keywords:
