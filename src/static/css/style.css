@@ -1,25 +1,9 @@
 @import url('https://fonts.googleapis.com/css2?family=Krona+One&display=swap');
 
-.myrows{
-    border: 3px solid green;
-    padding: 5px ;
-}
-.mycols{
-    border: 3px solid red;
-}
-.mycontainer{
-    background-color: aqua;
-}
-
 .container-fluid{
     padding-left: 0;
     padding-right: 0;
     height:10%;
-}
-
-#header{
-    padding-left: 0;
-    padding-right: 0;
 }
 
 #bottomHeader h1{
@@ -67,31 +51,9 @@ body {
     background-image: url('/static/double-bubble-outline.png');
     background-repeat: repeat;
 }
-.heading-title {
-    margin-bottom: 50px;
-    margin-left:90px;
-    margin-top: 75px;
-}
+
 .text-center {
     text-align: center;
-}
-.heading-title h3 {
-    margin-bottom: 0;
-    letter-spacing: 2px;
-    font-weight: normal;
-}
-.p-top-30 {
-    padding-top: 30px;
-}
-.half-txt {
-    width: 70%;
-    margin: 0 auto;
-    display: inline-block;
-    line-height: 25px;
-    color: #7e7e7e;
-}
-.text-uppercase {
-    text-transform: uppercase;
 }
 
 .chat,
