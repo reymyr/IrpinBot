@@ -2,17 +2,27 @@ import string
 from stringMatching import *
 import datetime
 from flask_sqlalchemy import SQLAlchemy
-from flask import Flask, render_template, request, redirect
+from flask_session import Session
+from flask import Flask, render_template, request, redirect, session
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://vudbnpdnxobjpa:3898a90b83f4b374ec08fc1fedb87f7bb1787696f8722ea5a52ad4cd05e7c0be@ec2-52-45-73-150.compute-1.amazonaws.com:5432/dcvg700sjjstrh'
+SESSION_TYPE = 'filesystem'
+app.config.from_object(__name__)
+Session(app)
+
 db = SQLAlchemy(app)
 
 keywords = ["Kuis", "Ujian", "Tucil", "Tubes", "Praktikum"]
 helpWords = ["bisa", "kemampuan", "fitur", "help", "bantuan", "tolong"]
 updateWords = ["diubah","diundur","dimajukan"]
-doneWords = ["selesai", "beres", "udah"]
+doneWords = ["selesai", "beres", "udah", "kelar"]
+seluruh = ["sejauh ini", "sampai sekarang", "semuanya", "sampe sekarang", "semua"]
+between = [["antara", "sampai"], ["antara", "dan"], ["dari", "sampai"]]
+nWeek = ["minggu ke depan", "minggu dari sekarang"]
+nDays = ["hari ke depan", "hari dari sekarang"]
+hariIni = ["hari ini"]
 
 class Task(db.Model):
     id_task = db.Column(db.Integer, primary_key = True)
@@ -21,49 +31,58 @@ class Task(db.Model):
     jenis = db.Column(db.String(10))
     topik = db.Column(db.String(100))
 
-class Keyword(db.Model):
-    id_keyword = db.Column(db.Integer, primary_key = True)
-    jenis = db.Column(db.String(10))
-
-
-messages=[]
-
 @app.route('/')
 def index():
-    return render_template('index.html', messages=messages)
+    session['messages'] = []
+    
+    return redirect("/chat")
+
+@app.route("/chat")
+def chat():
+    if not session.get('messages'):
+        session['messages'] = []
+    return render_template('index.html', messages=session['messages'])
 
 @app.route('/send', methods=['POST'])
 def send():
     msg = request.form['message']
     if msg and not msg.isspace():
         reply = processMessage(msg)
-        messages.append(['sent', request.form['message']])
-        messages.append(['received', reply])
-    return redirect("/")
+        session['messages'].append(['sent', msg])
+        session['messages'].append(['received', reply])
+    return redirect("/chat")
 
 
 def processMessage(text):
     #first of all, check apakah ada kekeliruan di text
     listText = text.split()
     errorMsg, foundError = recommendWord(listText)
-    if foundError:
-        return errorMsg
 
+    result = ""
 
     # If ada 4 komponen, add task
     if (len(getDates(text)) > 0 or len(getDatesAlternate(text)) > 0) and len(getKodeMatkul(text)) > 0 and len(getTopic(text)) > 0:
-        return addTasks(text)
+        result = addTasks(text)
 
     if len(getKodeMatkul(text)) == 0:
         if (textContains(text,updateWords)):
-            return updateTasksDeadline(text)
+            result = updateTasksDeadline(text)
         elif (textContains(text,doneWords)):
-            return removeTask(text)
+            result = removeTask(text)
         elif (textContains(text,helpWords)):
-            return getHelp(text)
-        return getTasks(text)
+            result = getHelp(text)
+        else:
+            result = getTasks(text)
     elif len(getKodeMatkul(text)[0]) != 0:
-        return getTasksDeadline(text)
+        result = getTasksDeadline(text)
+
+    if result != "":
+        return result
+    else:
+        if foundError:
+            return errorMsg
+        else:
+            return "ga valid bro"
 
 def addTasks(text):
     keyValid = False
@@ -106,15 +125,10 @@ def addTasks(text):
         reply += "(ID: " + str(idTask) + ") " + tanggal[0] + " - " + kode[0] + " - " + key + " - " + topik
         return reply
     else:
-        return "ga valid bro #from addTasks"
+        return ""
 
 
 def getTasks(text):
-    seluruh = ["sejauh ini", "sampai sekarang", "semuanya", "sampe sekarang", "semua"]
-    between = [["antara", "sampai"], ["antara", "dan"], ["dari", "sampai"]]
-    nWeek = ["minggu ke depan", "minggu dari sekarang"]
-    nDays = ["hari ke depan", "hari dari sekarang"]
-    hariIni = ["hari ini"]
     today = datetime.date.today()
     start = None
     end = None
@@ -127,7 +141,6 @@ def getTasks(text):
         all = True
         timeValid = True
     elif any(textContains(text, keys, all=True) for keys in between):
-        print("hai")
         dates = getDates(text)
         if len(dates) == 2:
             start = min(datetime.datetime.strptime(dates[0], "%d/%m/%Y").date(), datetime.datetime.strptime(dates[1], "%d/%m/%Y").date())
@@ -183,7 +196,7 @@ def getTasks(text):
                 reply += str(i+1) + ". (ID: " + str(task.id_task) + ") " + task.tanggal.strftime("%d/%m/%Y") + " - " + task.kode + " - " + task.jenis + " - " + task.topik + '<br>'
         return reply
     else:
-        return "ga valid bro"
+        return ""
 
 def getTasksDeadline(text):
     kodeMatkul = getKodeMatkul(text)
@@ -212,15 +225,14 @@ def getTasksDeadline(text):
                 reply += str(i+1) + ". " + task.tanggal.strftime("%d/%m/%Y") + " - " + task.jenis + " - " + task.topik + '<br>'
         return reply
     else:
-        return "ga valid bro"
+        return ""
 
 def updateTasksDeadline(text):
-    kataKunci = ["diubah","diundur","dimajukan"]
     date = None
     keyValid = False
     id = None
 
-    for key in kataKunci:
+    for key in updateWords:
         if textContains(text,[key]):
             keyValid = True
             break
@@ -236,9 +248,9 @@ def updateTasksDeadline(text):
             date[0] = convertDateFormat(date[0])
 
         if (len(id) == 0):
-            return "ga valid bro"
+            return ""
         if (len(date) == 0):
-            return "ga valid bro"
+            return ""
         # print(date[0])
 
         tasks = Task.query.filter((Task.id_task == int(id[0]))).all()
@@ -252,7 +264,7 @@ def updateTasksDeadline(text):
             reply = "Deadline task " + id[0] + " " + key + " menjadi " + date[0]
         return reply
     else:
-        return "ga valid bro"
+        return ""
 
 def removeTask(text):
     idTask = getIdTask(text)
@@ -266,13 +278,12 @@ def removeTask(text):
             Task.query.filter((Task.id_task == idTask[0])).delete()
             db.session.commit()
             return reply                
-    return "ga valid bro"
+    return ""
 
 
 
 def getHelp(text):
     fitur = ["Menambahkan task baru", "Melihat daftar task", "Melihat deadline task tertentu", "Memperbaharui task tertentu", "Menandai task yang sudah dikerjakan"]
-
     reply = None
     if textContains(text, helpWords):
         reply = '[Fitur]<br>'
@@ -285,7 +296,7 @@ def getHelp(text):
             reply += str(i+1) + ". " + keywords[i] + '<br>'
         return reply
     else:
-        return "ga valid bro"
+        return ""
 
 # mereturn berapa perubahan yang harus dilakukan untuk dari word1 menjadi word2
 def levenshtein(word1, word2):
