@@ -6,7 +6,7 @@ from flask import Flask, render_template, request, redirect
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgres://vudbnpdnxobjpa:3898a90b83f4b374ec08fc1fedb87f7bb1787696f8722ea5a52ad4cd05e7c0be@ec2-52-45-73-150.compute-1.amazonaws.com:5432/dcvg700sjjstrh'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://vudbnpdnxobjpa:3898a90b83f4b374ec08fc1fedb87f7bb1787696f8722ea5a52ad4cd05e7c0be@ec2-52-45-73-150.compute-1.amazonaws.com:5432/dcvg700sjjstrh'
 db = SQLAlchemy(app)
 
 keywords = ["Kuis", "Ujian", "Tucil", "Tubes", "Praktikum"]
