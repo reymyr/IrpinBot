@@ -19,7 +19,7 @@ def getDatesAlternate(text):
 
 # Mengembalikan topik tugas dalam text
 def getTopic(text):
-    temporaryTuple = re.findall(r"(\b[A-Z]{2}\d{4}\b(.|\b)*\bpada\b)", text) #masih mengandung kode matkul dan kata "pada"
+    temporaryTuple = re.findall(r"(\b[A-Za-z]{2}\d{4}\b(.|\b)*\bpada\b)", text) #masih mengandung kode matkul dan kata "pada"
     if (len(temporaryTuple) == 0):
         return getTopic2(text)
     temporaryText = temporaryTuple[0][0].split()
