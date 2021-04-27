@@ -174,7 +174,6 @@ def getTasks(text):
 
     if keyValid and timeValid:
         tasks = None
-        print(jenis, start, end)
         if all:
             if jenis == "Deadline":
                 tasks = Task.query.all()
@@ -189,7 +188,7 @@ def getTasks(text):
         if len(tasks) == 0:
             reply = "Tidak ada"
         else:
-            reply = '[Daftar Deadline]<br>'
+            reply = '[Daftar ' + jenis + ']<br>'
             for i in range(len(tasks)):
                 task = tasks[i]
                 reply += str(i+1) + ". (ID: " + str(task.id_task) + ") " + task.tanggal.strftime("%d/%m/%Y") + " - " + task.kode + " - " + task.jenis + " - " + task.topik + '<br>'
