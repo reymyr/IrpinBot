@@ -1,3 +1,4 @@
+from app import keywords
 import re
 
 months = {'januari': '1', 'februari':'2', 'maret':'3', 'april':'4','mei':'5','juni':'6','juli':'7','agustus':'8', 'september':'9',
@@ -20,22 +21,36 @@ def getDatesAlternate(text):
 def getTopic(text):
     temporaryTuple = re.findall(r"(\b[A-Z]{2}\d{4}\b(.|\b)*\bpada\b)", text) #masih mengandung kode matkul dan kata "pada"
     if (len(temporaryTuple) == 0):
-        return []
+        return getTopic2(text)
     temporaryText = temporaryTuple[0][0].split()
     rm = temporaryText[:-1]
     listToStr = ' '.join([elmt for elmt in rm])
     checkerTopic = listToStr.split(' ')
     if len(checkerTopic) <= 1:
-        return []
+        return getTopic2(text)
     finalSentences = listToStr.split(' ', 1)[1]
     listToStr = ''.join([elmt for elmt in finalSentences])
     return listToStr
 
+def getTopic2(text):
+    wordsToStrip = []
+    wordsToStrip += getDates(text) + getDatesAlternate(text) + getKodeMatkul(text) + keywords
+    t = text
+    for word in wordsToStrip:
+        t = re.sub(word, "", t, flags=re.IGNORECASE)
 
-# Mengembalikan kode matkul dalam text dengan format AAYYYY, A adalah huruf kapital dan Y adalah angka
+    match = re.search(r"topik(nya)?\b", t, re.IGNORECASE)
+    if match:
+        t = t.split(match.group(), 1)[-1].strip()
+        if len(t) != 0:
+            return t
+
+    return []
+
+# Mengembalikan kode matkul dalam text dengan format AAYYYY, A adalah huruf dan Y adalah angka
 def getKodeMatkul(text):
-    return re.findall(r"\b[A-Z]{2}\d{4}\b", text)
-
+    kode = re.findall(r"\b[A-Za-z]{2}\d{4}\b", text)
+    return [k.upper() for k in kode]
 # Mengembalikan no id task dalam text
 def getIdTask(text):
     return re.findall(r"\b(\d{1}|\d{2}|\d{3})\b", text)
