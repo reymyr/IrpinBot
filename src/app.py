@@ -30,6 +30,7 @@ messages=[]
 
 @app.route('/')
 def index():
+    print(messages)
     return render_template('index.html', messages=messages)
 
 @app.route('/send', methods=['POST'])
