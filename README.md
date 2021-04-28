@@ -11,7 +11,7 @@ Tugas Besar 3 IF2211 Strategi Algoritma Penerapan String Matching dan Regular Ex
     - [Run](#run)
 - [Manual Setup](#manual-setup)
 - [Author](#author)
-- 
+
 ## Requirements
 - [Python 3](https://www.python.org/downloads/)
 
