@@ -144,6 +144,9 @@ def getTasks(text):
             dates = getDates(text)
         else:
             dates = getDatesAlternate(text)
+            if len(dates) == 2:
+                dates[0] = convertDateFormat(dates[0])
+                dates[1] = convertDateFormat(dates[1])
         
         if len(dates) == 2:
             start = min(datetime.datetime.strptime(dates[0], "%d/%m/%Y").date(), datetime.datetime.strptime(dates[1], "%d/%m/%Y").date())
