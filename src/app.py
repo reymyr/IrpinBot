@@ -140,7 +140,11 @@ def getTasks(text):
         all = True
         timeValid = True
     elif any(textContains(text, keys, all=True) for keys in between):
-        dates = getDates(text)
+        if len(getDates(text)) > 0:
+            dates = getDates(text)
+        else:
+            dates = getDatesAlternate(text)
+        
         if len(dates) == 2:
             start = min(datetime.datetime.strptime(dates[0], "%d/%m/%Y").date(), datetime.datetime.strptime(dates[1], "%d/%m/%Y").date())
             end = max(datetime.datetime.strptime(dates[0], "%d/%m/%Y").date(), datetime.datetime.strptime(dates[1], "%d/%m/%Y").date())
