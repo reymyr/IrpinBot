@@ -7,7 +7,7 @@ from flask import Flask, render_template, request, redirect, session
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://vudbnpdnxobjpa:3898a90b83f4b374ec08fc1fedb87f7bb1787696f8722ea5a52ad4cd05e7c0be@ec2-52-45-73-150.compute-1.amazonaws.com:5432/dcvg700sjjstrh'
 SESSION_TYPE = 'filesystem'
 app.config.from_object(__name__)
 Session(app)
@@ -140,7 +140,14 @@ def getTasks(text):
         all = True
         timeValid = True
     elif any(textContains(text, keys, all=True) for keys in between):
-        dates = getDates(text)
+        if len(getDates(text)) > 0:
+            dates = getDates(text)
+        else:
+            dates = getDatesAlternate(text)
+            if len(dates) == 2:
+                dates[0] = convertDateFormat(dates[0])
+                dates[1] = convertDateFormat(dates[1])
+        
         if len(dates) == 2:
             start = min(datetime.datetime.strptime(dates[0], "%d/%m/%Y").date(), datetime.datetime.strptime(dates[1], "%d/%m/%Y").date())
             end = max(datetime.datetime.strptime(dates[0], "%d/%m/%Y").date(), datetime.datetime.strptime(dates[1], "%d/%m/%Y").date())
@@ -174,7 +181,6 @@ def getTasks(text):
 
     if keyValid and timeValid:
         tasks = None
-        print(jenis, start, end)
         if all:
             if jenis == "Deadline":
                 tasks = Task.query.all()
@@ -189,7 +195,7 @@ def getTasks(text):
         if len(tasks) == 0:
             reply = "Tidak ada"
         else:
-            reply = '[Daftar Deadline]<br>'
+            reply = '[Daftar ' + jenis + ']<br>'
             for i in range(len(tasks)):
                 task = tasks[i]
                 reply += str(i+1) + ". (ID: " + str(task.id_task) + ") " + task.tanggal.strftime("%d/%m/%Y") + " - " + task.kode + " - " + task.jenis + " - " + task.topik + '<br>'
@@ -293,6 +299,21 @@ def getHelp(text):
         reply += '[Kata Penting]<br>'
         for i in range(len(keywords)):
             reply += str(i+1) + ". " + keywords[i] + '<br>'
+
+        reply += '<br>'
+        reply += '[Kata Bantuan]<br>'
+        for i in range(len(helpWords)):
+            reply += str(i+1) + ". " + helpWords[i] + '<br>'
+
+        reply += '<br>'
+        reply += '[Kata Update]<br>'
+        for i in range(len(updateWords)):
+            reply += str(i+1) + ". " + updateWords[i] + '<br>'
+        
+        reply += '<br>'
+        reply += '[Kata Selesai]<br>'
+        for i in range(len(doneWords)):
+            reply += str(i+1) + ". " + doneWords[i] + '<br>'
         return reply
     else:
         return ""
